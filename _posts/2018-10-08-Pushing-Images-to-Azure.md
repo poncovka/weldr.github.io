@@ -133,22 +133,15 @@ Here's how you push it to *Azure* and create an instance from it:
     Alive[#####                                                           ]  9.1480%
     ...
 
-Once the upload to the *Azure BLOB* completes, we can create a disk image from it:
+Once the upload to the *Azure BLOB* completes, we can create an Azure image from it:
 
-    $ az disk create --resource-group $GROUP --name $VHD --size-gb 10 --location eastus --source https://$ACCOUNT.blob.core.windows.net/$CONTAINER/$VHD
+    $ az image create --resource-group $GROUP --name $VHD --os-type linux --location eastus --source https://$ACCOUNT.blob.core.windows.net/$CONTAINER/$VHD
      - Running ...
-
-Use cloud-init to configure the root password or SSH keys:
-
-    cat > cloud-init.txt <<EOF
-    #cloud-config
-    ssh_pwauth: True
-    chpasswd:
-      list: |
-        root:foobar
-    EOF
 
 Next create an instance either with the Azure portal, or a command similar to the following:
 
-    $ az vm create --resource-group $GROUP --location eastus --name $VHD --os-type linux --custom-data cloud-init.txt --attach-os-disk $VHD
+    $ az vm create --resource-group $GROUP --location eastus --name $VHD --image $VHD --admin-username azure-user --generate-ssh-keys
      - Running ...
+
+Use your private key via SSH to access the resulting instance as usual. The user to log
+in as is ```azure-user```
